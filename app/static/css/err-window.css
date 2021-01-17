@@ -1,0 +1,27 @@
+:root {
+  --lightgray: #efefef;
+  --blue: steelblue;
+  --white: #fff;
+  --black: rgba(0, 0, 0, 0.8);
+  --bounceEasing: cubic-bezier(0.51, 0.92, 0.24, 1.15);
+  --modal-font: 24px 'Arial', 'Helvetica', sans-serif;
+}
+
+.modal-err-window {
+  border: none;
+  font: var(--modal-font);
+  position: relative;
+  max-width: 400px;
+  max-height: 100vh;
+  border-radius: 5px;
+  background: var(--white);
+  overflow: auto;
+  cursor: default;
+  padding: .1em;
+}
+
+.modal-err-window p {
+  background-color: white;
+  color: #000;
+  border: none;
+}
