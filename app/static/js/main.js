@@ -1,6 +1,6 @@
 import CreatePlanDialog  from "./createPlanDialog.js";
 import ErrWindow from "./errWindow.js";
-import Menu from "./menuEngine.js";
+import Menu from "./menu.js";
 import WaitAnimation from "./waitAnimation.js";
 
 function App() {
