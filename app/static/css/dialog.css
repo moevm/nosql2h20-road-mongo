@@ -41,9 +41,12 @@
   cursor: pointer;
   float: right;
 }
-.modal-dialog input.submit-modal:hover {
+.modal-dialog input.submit-modal:hover,
+.modal-dialog input.submit-modal:active,
+.modal-dialog input.submit-modal:focus {
   background-color: #7ebc6f;
   border: .1em solid #7ebc6f;
+  outline: none;
   color: #fff;
 }
 

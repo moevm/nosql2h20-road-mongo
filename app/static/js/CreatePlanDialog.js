@@ -1,3 +1,5 @@
+import CreatePlanCommand from "./CreatePlanCommand.js";
+
 export default function CreatePlanDialog(app) {
     this.planExistsMsg = 'Не удалось добавить план. План с таким названием уже существует.';
     this.app = app;
@@ -16,11 +18,15 @@ export default function CreatePlanDialog(app) {
     this.close = () => {
         this.dialog.classList.remove("is-visible");
     };
-    this.sendCreatePlanRequest = () => {
+    this.getPlanName = () => {
+       return this.planNameInput.value;
+    };
+    this.sendCreatePlanRequest = async () => {
         this.app.onSendCreatePlanRequestStart();
-        fetch('/create-plan', {
-            method: 'POST',
-            body: this.planNameInput.value
-        }).then(response => this.app.onSendCreatePlanRequestEnd(response.status));
+        new CreatePlanCommand()
+            .execute(this.getPlanName())
+            .then((response) => {
+                this.app.onSendCreatePlanRequestEnd(response.status);
+            });
     };
 }

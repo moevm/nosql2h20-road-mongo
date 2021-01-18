@@ -6,40 +6,51 @@
     <link rel="stylesheet" href="../static/css/dialog.css"></link>
     <link rel="stylesheet" href="../static/css/modal.css"></link>
     <link rel="stylesheet" href="../static/css/err-window.css"></link>
+    <link rel="stylesheet" href="../static/css/index.css"></link>
 </head>
 <body>
-<ul id="Menu" class="Menu -horizontal">
-    <li class="-hasSubmenu">
-        <a href="#">План</a>
-        <ul>
-            <li><a class="create" href="#">Создать</a></li>
-            <li><a class="open" href="#">Открыть</a></li>
-            <li><a class="save" href="#">Сохранить</a></li>
-            <li><a class="delete" href="#">Удалить</a></li>
+<header>
+    <div>
+        <ul id="Menu" class="Menu -horizontal">
             <li class="-hasSubmenu">
-                <a class="import" href="#">Импортировать</a>
+                <a href="#">План</a>
                 <ul>
-                    <li><a class="importJSON" href="#">Импортировать JSON</a></li>
+                    <li><a class="create" href="#">Создать</a></li>
+                    <li><a class="open" href="#">Открыть</a></li>
+                    <li><a class="save" href="#">Сохранить</a></li>
+                    <li><a class="delete" href="#">Удалить</a></li>
+                    <li class="-hasSubmenu">
+                        <a class="import" href="#">Импортировать</a>
+                        <ul>
+                            <li><a class="importJSON" href="#">Импортировать JSON</a></li>
+                        </ul>
+                    </li>
+                    <li class="-hasSubmenu">
+                        <a class="export" href="#">Экспортировать</a>
+                        <ul>
+                            <li><a class="exportInJSON" href="#">Экспортировать в JSON</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </li>
-            <li class="-hasSubmenu">
-                <a class="export" href="#">Экспортировать</a>
-                <ul>
-                    <li><a class="exportInJSON" href="#">Экспортировать в JSON</a></li>
-                </ul>
-            </li>
+            <li><a href="#">Статистика</a></li>
         </ul>
-    </li>
-    <li><a href="#">Статистика</a></li>
-</ul>
+    </div>
+    <div class="plan">
+        <input class="plan-name" type="text">
+        <button class="normal">
+            Оценить фронт работ
+        </button>
+    </div>
+</header>
 <div class="modal" id="createPlanDialog">
     <div class="modal-dialog">
         <header class="modal-header">
             <label>Создание нового плана</label>
             <button class="close-modal">x</button>
         </header>
-            <input type="text" name="plan-name" placeholder="Название плана">
-            <input class="submit-modal" type="submit" value="Создать">
+        <input type="text" name="plan-name" placeholder="Название плана">
+        <input class="submit-modal" type="submit" value="Создать">
     </div>
 </div>
 <div class="modal" id="wait-animation">
