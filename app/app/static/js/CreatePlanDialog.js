@@ -1,7 +1,6 @@
 import CreatePlanCommand from "./CreatePlanCommand.js";
 
 export default function CreatePlanDialog(app) {
-    this.planExistsMsg = 'Не удалось добавить план. План с таким названием уже существует.';
     this.app = app;
     this.init = () => {
         this.dialog = document.getElementById("createPlanDialog");
@@ -23,10 +22,6 @@ export default function CreatePlanDialog(app) {
     };
     this.sendCreatePlanRequest = async () => {
         this.app.onSendCreatePlanRequestStart();
-        new CreatePlanCommand()
-            .execute(this.getPlanName())
-            .then((response) => {
-                this.app.onSendCreatePlanRequestEnd(response.status);
-            });
+        this.app.onSendCreatePlanRequestEnd(await new CreatePlanCommand().execute(this.getPlanName()));
     };
 }
