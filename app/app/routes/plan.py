@@ -11,3 +11,12 @@ def create_plan():
     plan_name = request.data.decode('utf-8')
     result = plan_service.create_plan(plan_name)
     return jsonify(result), 200
+
+//Написал вроде
+@plan_bp.route('/rename-plan', methods=['PUT'])
+def rename_plan():
+    time.sleep(1)
+    plan_name = request.data.decode('utf-8')
+    plan_name_new = request.data.decode('utf-8')
+    result = plan_service.rename_plan(plan_name, plan_name_new)
+    return jsonify(result), 200

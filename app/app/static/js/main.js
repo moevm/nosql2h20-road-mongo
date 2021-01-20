@@ -40,6 +40,30 @@ function App() {
             this.planWidget.show();
         }
     };
+    //Дописал это
+    this.onSendRenamePlanRequestStart = () => {
+        //Запомнить имя
+        planName = this.planWidget.getPlanName();
+    };
+    this.onSendRenamePlanRequestEnd = (res) => {
+        if (res.status !== 'success') {
+            switch (res.text) {
+                case Constants.EMPTY_PLAN_NAME_ERR:
+                    break;
+                case Constants.PLAN_NAME_EXISTS_ERR:
+                    this.errWindow.show(Constants.PLAN_NAME_EXISTS_MSG);
+                    break;
+                default:
+                    this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
+            }
+            //Вернули предыдущее имя
+            this.planWidget.setPlanName = planName
+        }
+        else {
+            //Не знаю нужно ли создавать RenamePlanDialog
+            this.planWidget.setPlanName(this.renamePlanDialog.getPlanName());
+        }
+    };
     this.showCreatePlanDialog = () => {
         this.menu.close();
         this.createPlanDialog.show();
