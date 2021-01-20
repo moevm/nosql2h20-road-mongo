@@ -14,6 +14,7 @@ function App() {
 
     this.run = () => {
         this.createPlanDialog.init();
+        this.planWidget.init();
         this.errWindow.init();
         this.waitAnimation.init();
     };
@@ -43,9 +44,10 @@ function App() {
     //Дописал это
     this.onSendRenamePlanRequestStart = () => {
         //Запомнить имя
-        planName = this.planWidget.getPlanName();
+        this.waitAnimation.show();
     };
     this.onSendRenamePlanRequestEnd = (res) => {
+        this.waitAnimation.close();
         if (res.status !== 'success') {
             switch (res.text) {
                 case Constants.EMPTY_PLAN_NAME_ERR:
@@ -57,17 +59,16 @@ function App() {
                     this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
             }
             //Вернули предыдущее имя
-            this.planWidget.setPlanName = planName
-        }
-        else {
-            //Не знаю нужно ли создавать RenamePlanDialog
-            this.planWidget.setPlanName(this.renamePlanDialog.getPlanName());
+            this.planWidget.restorePlanName();
         }
     };
     this.showCreatePlanDialog = () => {
         this.menu.close();
         this.createPlanDialog.show();
     };
+    this.onPlanNameChange = () => {
+        this.menu.close();
+    }
 }
 
 let app = new App();

@@ -12,7 +12,7 @@ def create_plan():
     result = plan_service.create_plan(plan_name)
     return jsonify(result), 200
 
-//Написал вроде
+# //Написал вроде
 @plan_bp.route('/rename-plan', methods=['PUT'])
 def rename_plan():
     time.sleep(1)
