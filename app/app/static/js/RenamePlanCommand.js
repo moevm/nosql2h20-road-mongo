@@ -1,4 +1,3 @@
-//Добавил эту штуку не знаю надо ли было в отдельный файл, вроде да
 export default function RenamePlanCommand() {
     this.execute = async (oldPlanName, newPlanName) => {
         const response = await fetch('/api/rename-plan', {
