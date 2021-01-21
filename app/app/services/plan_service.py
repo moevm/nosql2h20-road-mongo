@@ -15,5 +15,13 @@ class PlanService(object):
             return {'status': 'error', 'text': 'plan name exists'}
         return {'status': 'error', 'text': 'empty plan name'}
 
+    def rename_plan(self, name, name_new):
+        if name and name_new:
+            if not plan_dao.exists(name_new) and plan_dao.exists(name):
+                plan_dao.replace(name, name_new)
+                return {'status': 'success'}
+            return {'status': 'error', 'text': 'plan name exists'}
+        return {'status': 'error', 'text': 'empty plan name'}
+
 
 plan_service = PlanService()

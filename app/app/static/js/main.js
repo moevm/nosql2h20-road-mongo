@@ -14,6 +14,7 @@ function App() {
 
     this.run = () => {
         this.createPlanDialog.init();
+        this.planWidget.init();
         this.errWindow.init();
         this.waitAnimation.init();
     };
@@ -40,10 +41,33 @@ function App() {
             this.planWidget.show();
         }
     };
+    //Дописал это
+    this.onSendRenamePlanRequestStart = () => {
+        this.waitAnimation.show();
+    };
+    this.onSendRenamePlanRequestEnd = (res) => {
+        this.waitAnimation.close();
+        if (res.status !== 'success') {
+            switch (res.text) {
+                case Constants.EMPTY_PLAN_NAME_ERR:
+                    this.errWindow.show(Constants.EMPTY_PLAN_NAME_MSG);
+                    break;
+                case Constants.PLAN_NAME_EXISTS_ERR:
+                    this.errWindow.show(Constants.PLAN_NAME_EXISTS_MSG);
+                    break;
+                default:
+                    this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
+            }
+            this.planWidget.restorePlanName();
+        }
+    };
     this.showCreatePlanDialog = () => {
         this.menu.close();
         this.createPlanDialog.show();
     };
+    this.onPlanNameChange = () => {
+        this.menu.close();
+    }
 }
 
 let app = new App();
