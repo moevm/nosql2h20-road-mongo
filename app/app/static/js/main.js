@@ -24,7 +24,10 @@ function App() {
     };
     this.onSendCreatePlanRequestEnd = (res) => {
         this.waitAnimation.close();
-        if (res.status !== 'success') {
+        if (typeof res === 'undefined') {
+            this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
+        }
+        else if (res.status !== 'success') {
             switch (res.text) {
                 case Constants.EMPTY_PLAN_NAME_ERR:
                     this.errWindow.show(Constants.EMPTY_PLAN_NAME_MSG);
@@ -41,13 +44,15 @@ function App() {
             this.planWidget.show();
         }
     };
-    //Дописал это
     this.onSendRenamePlanRequestStart = () => {
         this.waitAnimation.show();
     };
     this.onSendRenamePlanRequestEnd = (res) => {
         this.waitAnimation.close();
-        if (res.status !== 'success') {
+        if (typeof res === 'undefined') {
+            this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
+        }
+        else if (res.status !== 'success') {
             switch (res.text) {
                 case Constants.EMPTY_PLAN_NAME_ERR:
                     this.errWindow.show(Constants.EMPTY_PLAN_NAME_MSG);
@@ -61,12 +66,19 @@ function App() {
             this.planWidget.restorePlanName();
         }
     };
-    this.showCreatePlanDialog = () => {
+    this.showCreatePlanDialog = (e) => {
         this.menu.close();
         this.createPlanDialog.show();
     };
     this.onPlanNameChange = () => {
         this.menu.close();
+    }
+    this.onServerUnexpectedError = (e) => {
+        this.waitAnimation.close();
+        this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
+        console.log(e);
+        console.log('а монга-то запущена?:)');
+        console.log('sudo service mongodb start');
     }
 }
 

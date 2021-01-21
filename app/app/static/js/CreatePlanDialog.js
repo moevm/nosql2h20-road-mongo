@@ -22,6 +22,15 @@ export default function CreatePlanDialog(app) {
     };
     this.sendCreatePlanRequest = async () => {
         this.app.onSendCreatePlanRequestStart();
-        this.app.onSendCreatePlanRequestEnd(await new CreatePlanCommand().execute(this.getPlanName()));
+        let planName = this.getPlanName();
+        let res;
+        try {
+            res = await new CreatePlanCommand().execute(planName);
+        }
+        catch(e) {
+            this.app.onServerUnexpectedError(e);
+            return;
+        }
+        this.app.onSendCreatePlanRequestEnd(res);
     };
 }

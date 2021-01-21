@@ -32,11 +32,17 @@ export default function PlanWidget(app) {
     };
     this.sendRenamePlanRequest = async () => {
         this.app.onSendRenamePlanRequestStart();
-        this.app.onSendRenamePlanRequestEnd(
-            await new RenamePlanCommand()
-                .execute(this.planNameCopy, this.getPlanName()
-                )
-        );
+        let oldPlanName = this.planNameCopy;
+        let newPlanName = this.getPlanName();
+        let res;
+        try {
+            res = await new RenamePlanCommand().execute(oldPlanName, newPlanName);
+        }
+        catch(e) {
+            this.app.onServerUnexpectedError(e);
+            return;
+        }
+        this.app.onSendRenamePlanRequestEnd(res);
     }
     this.restorePlanName = () => {
         this.input.value = this.planNameCopy;
