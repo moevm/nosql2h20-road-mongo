@@ -1,3 +1,5 @@
+from app.db import mongo
+
 plans = []
 
 
@@ -12,10 +14,9 @@ class PlanDAO(object):
         return plan_id in plans
 
     def replace(self, plan_id, plan_id_new):
+        global plans
         plans.remove(plan_id)
         plans.append(plan_id_new)
-         # plan_id in plans = plan_id_new
-        # //Нужно присвоить новое имя, но я не знаю как
 
 
 plan_dao = PlanDAO()

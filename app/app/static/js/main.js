@@ -43,7 +43,6 @@ function App() {
     };
     //Дописал это
     this.onSendRenamePlanRequestStart = () => {
-        //Запомнить имя
         this.waitAnimation.show();
     };
     this.onSendRenamePlanRequestEnd = (res) => {
@@ -51,6 +50,7 @@ function App() {
         if (res.status !== 'success') {
             switch (res.text) {
                 case Constants.EMPTY_PLAN_NAME_ERR:
+                    this.errWindow.show(Constants.EMPTY_PLAN_NAME_MSG);
                     break;
                 case Constants.PLAN_NAME_EXISTS_ERR:
                     this.errWindow.show(Constants.PLAN_NAME_EXISTS_MSG);
@@ -58,7 +58,6 @@ function App() {
                 default:
                     this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
             }
-            //Вернули предыдущее имя
             this.planWidget.restorePlanName();
         }
     };
