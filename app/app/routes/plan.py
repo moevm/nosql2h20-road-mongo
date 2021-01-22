@@ -15,7 +15,7 @@ def create_plan():
     if result is PlanServiceResponse.success:
         return jsonify({'status': 'success', 'action': 'create plan'}), 200
 
-    text = result.title.split('_')
+    text = result.name.replace('_', ' ')
 
     return jsonify({'status': 'error', 'action': 'create plan', 'text': text}), 200
 
@@ -29,8 +29,8 @@ def rename_plan():
     result = plan_service.rename_plan(old_plan_name, new_plan_name)
 
     if result is PlanServiceResponse.success:
-        return jsonify({'status': 'success', 'action': 'rename_plan'}), 200
+        return jsonify({'status': 'success', 'action': 'rename plan'}), 200
 
-    text = result.title.split('_')
+    text = result.name.replace('_', ' ')
 
-    return jsonify({'status': 'error', 'action': 'rename_plan', 'text': text}), 200
+    return jsonify({'status': 'error', 'action': 'rename plan', 'text': text}), 200

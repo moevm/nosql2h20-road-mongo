@@ -12,7 +12,7 @@ export const PLAN_NAME_EXISTS_ERR = 'plan name exists';
 export const PLAN_NAME_NOT_EXISTS_ERR = 'plan name not exists';
 export const INVALID_PLAN_NAME_ERR = 'invalid plan name';
 export const INVALID_RENAME_PLAN_NAME_ERR = 'invalid rename plan name';
-export const RENAME_PLAN_NAME_EXISTS_ERR = 'rename_plan name exists';
+export const RENAME_PLAN_NAME_EXISTS_ERR = 'rename plan name exists';
 
 export const SUCCESS = 'success';
 

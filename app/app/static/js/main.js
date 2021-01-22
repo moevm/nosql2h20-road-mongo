@@ -55,6 +55,7 @@ function App() {
         console.log('sudo service mongodb start');
     }
     this.checkServerRequestResult = (res, successCallback, failureCallback) => {
+        console.log(res)
         this.waitAnimation.close();
         if (typeof res === 'undefined' ||
             !res.hasOwnProperty('status') ||
@@ -64,27 +65,40 @@ function App() {
         {
             this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
             failureCallback();
-        } else if (res.status !== 'success') {
-            let msg = "";
+        }
+        else if (res.status !== 'success') {
+            let actionMsg = "", textMsg = "";
             switch (res.action) {
                 case Constants.ACTON_CREATE_PLAN:
-                    msg += Constants.FAILED_TO_CREATE_PLAN_MSG;
+                    actionMsg = Constants.FAILED_TO_CREATE_PLAN_MSG;
                     break;
                 case Constants.ACTON_RENAME_PLAN:
-
+                    actionMsg = Constants.FAILED_TO_RENAME_PLAN_MSG;
+                    break;
+                default:
+                    break;
             }
             switch (res.text) {
                 case Constants.INVALID_PLAN_NAME_ERR:
-                    this.errWindow.show(Constants.INVALID_PLAN_NAME_MSG);
+                    textMsg = Constants.INVALID_PLAN_NAME_MSG;
                     break;
                 case Constants.PLAN_NAME_EXISTS_ERR:
-                    this.errWindow.show(Constants.PLAN_NAME_EXISTS_MSG);
+                case Constants.RENAME_PLAN_NAME_EXISTS_ERR:
+                    textMsg = Constants.PLAN_NAME_EXISTS_MSG;
                     break;
+                case Constants.PLAN_NAME_NOT_EXISTS_ERR:
                 default:
-                    this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
+                    break;
+            }
+            if (actionMsg === "" || textMsg === "") {
+                this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
+            }
+            else {
+                this.errWindow.show(actionMsg + " " + textMsg);
             }
             failureCallback();
-        } else {
+        }
+        else {
             successCallback();
         }
     }
