@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../static/css/modal.css"></link>
     <link rel="stylesheet" href="../static/css/err-window.css"></link>
     <link rel="stylesheet" href="../static/css/index.css"></link>
+    <link rel="stylesheet" href="../static/css/review-dialog.css"></link>
 </head>
 <body>
 <header>
@@ -67,21 +68,16 @@
     </div>
 </div>
 <div class="modal" id="DeletePlanDialog">
-    <div class="modal-dialog">
+    <div class="modal-review">
         <header class="modal-header">
             <label>Удаление плана</label>
             <button class="close-modal">x</button>
         </header>
-        <form>
-            <p><select name="plansToDelete" size="5" multiple>
-                <option selected value="s1">План 1</option>
-                <option value="s2">План 2</option>
-                <option value="s3">План 3</option>
-                <option value="s4">План 4</option>
-                <option value="s5">План 5</option>
-            </select>
-                <input type="submit" value="Отправить"></p>
-        </form>
+            <p>
+                <select name="plansToDelete" size="5" multiple>
+                    <option value="s1">План 1</option>
+                </select>
+            </p>
         <input class="submit-modal" type="submit" value="Удалить">
     </div>
 </div>
