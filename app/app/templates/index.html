@@ -66,10 +66,24 @@
         </p>
     </div>
 </div>
-<div class="modal" id="review-dialog">
-   <div>
-
-   </div>
+<div class="modal" id="DeletePlanDialog">
+    <div class="modal-dialog">
+        <header class="modal-header">
+            <label>Удаление плана</label>
+            <button class="close-modal">x</button>
+        </header>
+        <form>
+            <p><select name="plansToDelete" size="5" multiple>
+                <option selected value="s1">План 1</option>
+                <option value="s2">План 2</option>
+                <option value="s3">План 3</option>
+                <option value="s4">План 4</option>
+                <option value="s5">План 5</option>
+            </select>
+                <input type="submit" value="Отправить"></p>
+        </form>
+        <input class="submit-modal" type="submit" value="Удалить">
+    </div>
 </div>
 
 </body>
