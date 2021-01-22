@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from app.services import plan_service
+from app.services import plan_service, PlanServiceResponse
 import time
 import json
 
@@ -11,7 +11,13 @@ def create_plan():
     time.sleep(1)
     plan_name = request.data.decode('utf-8')
     result = plan_service.create_plan(plan_name)
-    return jsonify(result), 200
+
+    if result is PlanServiceResponse.success:
+        return jsonify({'status': 'success', 'action': 'create plan'}), 200
+
+    text = result.title.split('_')
+
+    return jsonify({'status': 'error', 'action': 'create plan', 'text': text}), 200
 
 
 @plan_bp.route('/rename-plan', methods=['PUT'])
@@ -21,4 +27,10 @@ def rename_plan():
     old_plan_name = data['oldPlanName']
     new_plan_name = data['newPlanName']
     result = plan_service.rename_plan(old_plan_name, new_plan_name)
-    return jsonify(result), 200
+
+    if result is PlanServiceResponse.success:
+        return jsonify({'status': 'success', 'action': 'rename_plan'}), 200
+
+    text = result.title.split('_')
+
+    return jsonify({'status': 'error', 'action': 'rename_plan', 'text': text}), 200

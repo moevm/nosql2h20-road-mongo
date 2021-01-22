@@ -56,13 +56,26 @@ function App() {
     }
     this.checkServerRequestResult = (res, successCallback, failureCallback) => {
         this.waitAnimation.close();
-        if (typeof res === 'undefined') {
+        if (typeof res === 'undefined' ||
+            !res.hasOwnProperty('status') ||
+            typeof res.status === 'undefined' ||
+            !res.hasOwnProperty('action') ||
+            typeof res.action === 'undefined')
+        {
             this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
             failureCallback();
         } else if (res.status !== 'success') {
+            let msg = "";
+            switch (res.action) {
+                case Constants.ACTON_CREATE_PLAN:
+                    msg += Constants.FAILED_TO_CREATE_PLAN_MSG;
+                    break;
+                case Constants.ACTON_RENAME_PLAN:
+
+            }
             switch (res.text) {
-                case Constants.EMPTY_PLAN_NAME_ERR:
-                    this.errWindow.show(Constants.EMPTY_PLAN_NAME_MSG);
+                case Constants.INVALID_PLAN_NAME_ERR:
+                    this.errWindow.show(Constants.INVALID_PLAN_NAME_MSG);
                     break;
                 case Constants.PLAN_NAME_EXISTS_ERR:
                     this.errWindow.show(Constants.PLAN_NAME_EXISTS_MSG);
