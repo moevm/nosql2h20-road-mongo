@@ -55,6 +55,7 @@ class PlanService(object):
 
     @__check_plan_name(True)
     def delete_plan(self, name):
+        plan_dao.delete(name)
         return PlanServiceResponse.success
 
     @__check_plan_name(True)

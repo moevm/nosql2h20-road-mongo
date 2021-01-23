@@ -34,3 +34,17 @@ def rename_plan():
     text = result.name.replace('_', ' ')
 
     return jsonify({'status': 'error', 'action': 'rename plan', 'text': text}), 200
+
+
+@plan_bp.route('/delete-plan', methods=['DELETE'])
+def delete_plan():
+    time.sleep(1)
+    plan_name = request.data.decode('utf-8')
+    result = plan_service.delete_plan(plan_name)
+
+    if result is PlanServiceResponse.success:
+        return jsonify({'status': 'success', 'action': 'delete plan'}), 200
+
+    text = result.name.replace('_', ' ')
+
+    return jsonify({'status': 'error', 'action': 'delete plan', 'text': text}), 200
