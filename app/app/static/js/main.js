@@ -1,4 +1,4 @@
-import CreatePlanDialog  from "./CreatePlanDialog.js";
+import CreatePlanDialog from "./CreatePlanDialog.js";
 import ErrWindow from "./ErrWindow.js";
 import Menu from "./Menu.js";
 import WaitAnimation from "./WaitAnimation.js";
@@ -23,48 +23,22 @@ function App() {
         this.waitAnimation.show();
     };
     this.onSendCreatePlanRequestEnd = (res) => {
-        this.waitAnimation.close();
-        if (typeof res === 'undefined') {
-            this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
-        }
-        else if (res.status !== 'success') {
-            switch (res.text) {
-                case Constants.EMPTY_PLAN_NAME_ERR:
-                    this.errWindow.show(Constants.EMPTY_PLAN_NAME_MSG);
-                    break;
-                case Constants.PLAN_NAME_EXISTS_ERR:
-                    this.errWindow.show(Constants.PLAN_NAME_EXISTS_MSG);
-                    break;
-                default:
-                    this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
-            }
-        }
-        else {
-            this.planWidget.setPlanName(this.createPlanDialog.getPlanName());
-            this.planWidget.show();
-        }
+        this.checkServerRequestResult(res,
+            () => {
+                this.planWidget.setPlanName(this.createPlanDialog.getPlanName());
+                this.planWidget.show();
+            },
+            () => {}
+            );
     };
     this.onSendRenamePlanRequestStart = () => {
         this.waitAnimation.show();
     };
     this.onSendRenamePlanRequestEnd = (res) => {
-        this.waitAnimation.close();
-        if (typeof res === 'undefined') {
-            this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
-        }
-        else if (res.status !== 'success') {
-            switch (res.text) {
-                case Constants.EMPTY_PLAN_NAME_ERR:
-                    this.errWindow.show(Constants.EMPTY_PLAN_NAME_MSG);
-                    break;
-                case Constants.PLAN_NAME_EXISTS_ERR:
-                    this.errWindow.show(Constants.PLAN_NAME_EXISTS_MSG);
-                    break;
-                default:
-                    this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
-            }
-            this.planWidget.restorePlanName();
-        }
+        this.checkServerRequestResult(res,
+            () => {},
+            () => {this.planWidget.restorePlanName();}
+            );
     };
     this.showCreatePlanDialog = (e) => {
         this.menu.close();
@@ -79,6 +53,54 @@ function App() {
         console.log(e);
         console.log('а монга-то запущена?:)');
         console.log('sudo service mongodb start');
+    }
+    this.checkServerRequestResult = (res, successCallback, failureCallback) => {
+        console.log(res)
+        this.waitAnimation.close();
+        if (typeof res === 'undefined' ||
+            !res.hasOwnProperty('status') ||
+            typeof res.status === 'undefined' ||
+            !res.hasOwnProperty('action') ||
+            typeof res.action === 'undefined')
+        {
+            this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
+            failureCallback();
+        }
+        else if (res.status !== 'success') {
+            let actionMsg = "", textMsg = "";
+            switch (res.action) {
+                case Constants.ACTON_CREATE_PLAN:
+                    actionMsg = Constants.FAILED_TO_CREATE_PLAN_MSG;
+                    break;
+                case Constants.ACTON_RENAME_PLAN:
+                    actionMsg = Constants.FAILED_TO_RENAME_PLAN_MSG;
+                    break;
+                default:
+                    break;
+            }
+            switch (res.text) {
+                case Constants.INVALID_PLAN_NAME_ERR:
+                    textMsg = Constants.INVALID_PLAN_NAME_MSG;
+                    break;
+                case Constants.PLAN_NAME_EXISTS_ERR:
+                case Constants.RENAME_PLAN_NAME_EXISTS_ERR:
+                    textMsg = Constants.PLAN_NAME_EXISTS_MSG;
+                    break;
+                case Constants.PLAN_NAME_NOT_EXISTS_ERR:
+                default:
+                    break;
+            }
+            if (actionMsg === "" || textMsg === "") {
+                this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
+            }
+            else {
+                this.errWindow.show(actionMsg + " " + textMsg);
+            }
+            failureCallback();
+        }
+        else {
+            successCallback();
+        }
     }
 }
 
