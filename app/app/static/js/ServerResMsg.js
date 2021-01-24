@@ -15,9 +15,11 @@ function buildUnexpectedErrMsg(f) {
         return f.call(this, ...arguments);
     };
 }
+
 function concat(action, text) {
     return `${action} ${text}`;
 }
+
 function buildCreatePlanResMsg(res) {
     if (res.status !== 'success') {
         let action = "";
@@ -48,6 +50,7 @@ function buildCreatePlanResMsg(res) {
     }
     return ["", Const.SUCCESS];
 }
+
 function buildRenamePlanResMsg(res) {
     if (res.status !== 'success') {
         let action = "";
@@ -78,6 +81,7 @@ function buildRenamePlanResMsg(res) {
     }
     return ["", Const.SUCCESS];
 };
+
 function buildGetPlanNamesResMsg(res) {
     let hasNames = res.hasOwnProperty('names');
     let namesT = typeof res.names === 'undefined';
@@ -106,6 +110,7 @@ function buildGetPlanNamesResMsg(res) {
     }
     return ["", Const.SUCCESS];
 }
+
 function buildOpenPlanResMsg(res) {
     let hasPlan = res.hasOwnProperty('plan');
     let planT = typeof res.names === 'undefined';
@@ -134,9 +139,36 @@ function buildOpenPlanResMsg(res) {
     return ["", Const.SUCCESS];
 }
 
+function buildDeletePlanResMsg(res) {
+    if (res.status !== 'success') {
+        let action = "";
+        let text = "";
+
+        if (res.action === Const.ACTON_DELETE_PLAN) {
+            action = Const.FAILED_TO_DELETE_PLAN_MSG;
+        } else {
+            return [Const.UNEXPECTED_ERR_MSG, Const.UNEXPECTED_ERR];
+        }
+
+        switch (res.text) {
+            case Const.UNEXPECTED_DB_ERR:
+                text = Const.UNEXPECTED_DB_ERR_MSG;
+                break;
+            case Const.PLAN_NAME_NOT_EXISTS_ERR:
+            case Const.INVALID_PLAN_NAME_ERR:
+            default:
+                return [Const.UNEXPECTED_ERR_MSG, Const.UNEXPECTED_ERR_MSG];
+        }
+
+        return [concat(action, text), text];
+    }
+    return ["", Const.SUCCESS];
+}
+
 buildCreatePlanResMsg = buildUnexpectedErrMsg(buildCreatePlanResMsg);
 buildRenamePlanResMsg = buildUnexpectedErrMsg(buildRenamePlanResMsg);
 buildGetPlanNamesResMsg = buildUnexpectedErrMsg(buildGetPlanNamesResMsg);
 buildOpenPlanResMsg = buildUnexpectedErrMsg(buildOpenPlanResMsg);
+buildDeletePlanResMsg = buildUnexpectedErrMsg(buildDeletePlanResMsg);
 
-export {buildCreatePlanResMsg, buildRenamePlanResMsg, buildGetPlanNamesResMsg, buildOpenPlanResMsg}
+export {buildCreatePlanResMsg, buildRenamePlanResMsg, buildGetPlanNamesResMsg, buildOpenPlanResMsg, buildDeletePlanResMsg}
