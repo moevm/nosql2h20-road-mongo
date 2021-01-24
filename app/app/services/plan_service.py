@@ -9,7 +9,7 @@ PlanServiceResponse = Enum('PlanServiceResponse',
                            'invalid_rename_plan_name '
                            'rename_plan_name_exists '
                            'success '
-                           'unexpected db err'
+                           'unexpected_db_err'
                            )
 
 
