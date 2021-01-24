@@ -8,11 +8,15 @@ PlanServiceResponse = Enum('PlanServiceResponse',
                            'invalid_plan_name '
                            'invalid_rename_plan_name '
                            'rename_plan_name_exists '
-                           'success'
+                           'success '
+                           'unexpected db err'
                            )
 
 
 class PlanService(object):
+
+    def __init__(self):
+        self._resource = None
 
     @staticmethod
     def is_valid_plan_name(name):
@@ -59,8 +63,21 @@ class PlanService(object):
         return PlanServiceResponse.success
 
     @__check_plan_name(True)
+    def open_plan(self, name):
+        self._resource = plan_dao.get(name)
+        return PlanServiceResponse.success
+
+    @__check_plan_name(True)
     def estimate_plan(self, name):
         # some 'super' logic
+        return PlanServiceResponse.success
+
+    def get_resource(self):
+        resource, self._resource = self._resource, None
+        return resource
+
+    def get_plan_names(self):
+        self._resource = plan_dao.get_plan_names()
         return PlanServiceResponse.success
 
 

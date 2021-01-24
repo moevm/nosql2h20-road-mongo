@@ -24,5 +24,13 @@ class PlanDAO(object):
         plans.remove(name)
         return True
 
+    def get(self, name):
+        global plans
+        return name
+
+    def get_plan_names(self):
+        global plans
+        return plans
+
 
 plan_dao = PlanDAO()

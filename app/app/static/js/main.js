@@ -1,21 +1,25 @@
+import OpenPlanDialog from "./OpenPlanDialog.js";
 import CreatePlanDialog from "./CreatePlanDialog.js";
-import ErrWindow from "./ErrWindow.js";
+import MsgWindow from "./MsgWindow.js";
 import Menu from "./Menu.js";
 import WaitAnimation from "./WaitAnimation.js";
 import PlanWidget from "./PlanWidget.js";
-import * as Constants from "./Constants.js"
+import * as Const from "./Constants.js"
+import * as msg from "./ServerResMsg.js";
 
 function App() {
     this.createPlanDialog = new CreatePlanDialog(this);
-    this.errWindow = new ErrWindow(this);
+    this.openPlanDialog = new OpenPlanDialog(this, "open-plan-dialog");
+    this.msgWindow = new MsgWindow(this);
     this.menu = new Menu(this);
     this.waitAnimation = new WaitAnimation(this);
     this.planWidget = new PlanWidget(this);
 
     this.run = () => {
         this.createPlanDialog.init();
+        this.openPlanDialog.init();
         this.planWidget.init();
-        this.errWindow.init();
+        this.msgWindow.init();
         this.waitAnimation.init();
     };
     this.onSendCreatePlanRequestStart = () => {
@@ -23,22 +27,58 @@ function App() {
         this.waitAnimation.show();
     };
     this.onSendCreatePlanRequestEnd = (res) => {
-        this.checkServerRequestResult(res,
-            () => {
-                this.planWidget.setPlanName(this.createPlanDialog.getPlanName());
-                this.planWidget.show();
-            },
-            () => {}
-            );
+        this.waitAnimation.close();
+        let [m, text] = msg.buildCreatePlanResMsg(res);
+        if (text === Const.SUCCESS) {
+            this.planWidget.setPlanName(this.createPlanDialog.getPlanName());
+            this.planWidget.show();
+            return;
+        }
+        this.msgWindow.show(m);
     };
     this.onSendRenamePlanRequestStart = () => {
         this.waitAnimation.show();
     };
     this.onSendRenamePlanRequestEnd = (res) => {
-        this.checkServerRequestResult(res,
-            () => {},
-            () => {this.planWidget.restorePlanName();}
-            );
+        this.waitAnimation.close();
+        let [m, text] = msg.buildRenamePlanResMsg(res);
+        if (text !== Const.SUCCESS) {
+            this.msgWindow.show(m);
+            this.planWidget.restorePlanName();
+        }
+    };
+    this.onSendOpenPlanRequestStart = () => {
+        this.openPlanDialog.close();
+        this.waitAnimation.show();
+    };
+    this.onSendOpenPlanRequestEnd = (res) => {
+        this.openPlanDialog.clearItemList();
+        this.waitAnimation.close();
+        let [m, text] = msg.buildOpenPlanResMsg(res);
+        if (text === Const.SUCCESS) {
+            this.planWidget.setPlanName(this.openPlanDialog.getPlanName());
+            this.planWidget.show();
+            return;
+        }
+        this.msgWindow.show(m);
+    }
+    this.onGetPlanNamesRequestStart = () => {
+        this.menu.close();
+        this.waitAnimation.show();
+    };
+    this.onGetPlanNamesRequestEnd = (res) => {
+        this.waitAnimation.close();
+        let [m, text] = msg.buildGetPlanNamesResMsg(res);
+        if (text === Const.SUCCESS) {
+            this.openPlanDialog.pushItemList(res.names);
+            this.openPlanDialog.show();
+            return;
+        }
+        this.msgWindow.show(m);
+    }
+    this.showOpenPlanDialog = (e) => {
+        this.menu.close();
+        this.openPlanDialog.show();
     };
     this.showCreatePlanDialog = (e) => {
         this.menu.close();
@@ -49,58 +89,10 @@ function App() {
     }
     this.onServerUnexpectedError = (e) => {
         this.waitAnimation.close();
-        this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
+        this.msgWindow.show(Const.UNEXPECTED_ERR_MSG);
         console.log(e);
         console.log('а монга-то запущена?:)');
         console.log('sudo service mongodb start');
-    }
-    this.checkServerRequestResult = (res, successCallback, failureCallback) => {
-        console.log(res)
-        this.waitAnimation.close();
-        if (typeof res === 'undefined' ||
-            !res.hasOwnProperty('status') ||
-            typeof res.status === 'undefined' ||
-            !res.hasOwnProperty('action') ||
-            typeof res.action === 'undefined')
-        {
-            this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
-            failureCallback();
-        }
-        else if (res.status !== 'success') {
-            let actionMsg = "", textMsg = "";
-            switch (res.action) {
-                case Constants.ACTON_CREATE_PLAN:
-                    actionMsg = Constants.FAILED_TO_CREATE_PLAN_MSG;
-                    break;
-                case Constants.ACTON_RENAME_PLAN:
-                    actionMsg = Constants.FAILED_TO_RENAME_PLAN_MSG;
-                    break;
-                default:
-                    break;
-            }
-            switch (res.text) {
-                case Constants.INVALID_PLAN_NAME_ERR:
-                    textMsg = Constants.INVALID_PLAN_NAME_MSG;
-                    break;
-                case Constants.PLAN_NAME_EXISTS_ERR:
-                case Constants.RENAME_PLAN_NAME_EXISTS_ERR:
-                    textMsg = Constants.PLAN_NAME_EXISTS_MSG;
-                    break;
-                case Constants.PLAN_NAME_NOT_EXISTS_ERR:
-                default:
-                    break;
-            }
-            if (actionMsg === "" || textMsg === "") {
-                this.errWindow.show(Constants.UNEXPECTED_ERROR_MSG);
-            }
-            else {
-                this.errWindow.show(actionMsg + " " + textMsg);
-            }
-            failureCallback();
-        }
-        else {
-            successCallback();
-        }
     }
 }
 

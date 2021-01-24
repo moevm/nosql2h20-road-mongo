@@ -4,7 +4,7 @@ export default function DeletePlanDialog(app) {
     this.app = app;
     this.init = () => {
         this.dialog = document.getElementById("deletePlanDialog");
-        #this.planNameInput = this.dialog.querySelectorAll('input[name="plan-name"]')[0];
+        this.planNameInput = this.dialog.querySelectorAll('input[name="plan-name"]')[0];
 
         document.querySelectorAll("#Menu a.create")[0].onclick = this.app.showCreatePlanDialog;
         document.querySelectorAll('#createPlanDialog input.submit-modal')[0].onclick = this.sendCreatePlanRequest;

@@ -48,3 +48,31 @@ def delete_plan():
     text = result.name.replace('_', ' ')
 
     return jsonify({'status': 'error', 'action': 'delete plan', 'text': text}), 200
+
+
+@plan_bp.route('/open-plan/<plan_name>', methods=['GET'])
+def open_plan(plan_name):
+    time.sleep(1)
+    result = plan_service.open_plan(plan_name)
+
+    if result is PlanServiceResponse.success:
+        plan = plan_service.get_resource()
+        return jsonify({'status': 'success', 'action': 'delete plan', 'plan': plan}), 200
+
+    text = result.name.replace('_', ' ')
+
+    return jsonify({'status': 'error', 'action': 'open plan', 'text': text}), 200
+
+
+@plan_bp.route('/get-plan-names/', methods=['GET'])
+def get_plan():
+    time.sleep(1)
+    result = plan_service.get_plan_names()
+
+    if result is PlanServiceResponse.success:
+        plan_names = plan_service.get_resource()
+        return jsonify({'status': 'success', 'action': 'delete plan', 'names': plan_names}), 200
+
+    text = result.name.replace('_', ' ')
+
+    return jsonify({'status': 'error', 'action': 'get plan names', 'text': text}), 200
