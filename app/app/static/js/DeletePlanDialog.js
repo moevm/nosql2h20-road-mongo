@@ -1,36 +1,25 @@
-import DeletePlanCommand from "./CreatePlanCommand.js";
+import ReviewPlanDialog from "./ReviewPlanDialog.js";
+import DeletePlanCommand from "./DeletePlanCommand.js";
 
-export default function DeletePlanDialog(app) {
-    this.app = app;
-    this.init = () => {
-        this.dialog = document.getElementById("deletePlanDialog");
-        this.planNameInput = this.dialog.querySelectorAll('input[name="plan-name"]')[0];
+export default function DeletePlanDialog(app, id) {
+    ReviewPlanDialog.apply(this, arguments);
 
-        document.querySelectorAll("#Menu a.create")[0].onclick = this.app.showCreatePlanDialog;
-        document.querySelectorAll('#createPlanDialog input.submit-modal')[0].onclick = this.sendCreatePlanRequest;
-        document.querySelectorAll('#createPlanDialog button.close-modal')[0].onclick = this.close;
-    };
-    this.show = () => {
-        this.planNameInput.value = "";
-        this.dialog.classList.add("is-visible");
-    };
-    this.close = () => {
-        this.dialog.classList.remove("is-visible");
-    };
-    this.getPlanName = () => {
-       return this.planNameInput.value;
-    };
-    this.sendCreatePlanRequest = async () => {
-        this.app.onSendCreatePlanRequestStart();
-        let planName = this.getPlanName();
+    this.sendDeletePlanRequest = async () => {
+        this.planName = this.select.value;
+        this.app.onSendDeletePlanRequestStart();
         let res;
         try {
-            res = await new CreatePlanCommand().execute(planName);
-        }
-        catch(e) {
+            res = await new DeletePlanCommand().execute(this.planName);
+        } catch (e) {
             this.app.onServerUnexpectedError(e);
             return;
         }
-        this.app.onSendCreatePlanRequestEnd(res);
+        this.app.onSendDeletePlanRequestEnd(res);
+    };
+    this.parentInit = this.init;
+    this.init = () => {
+        this.parentInit();
+        document.querySelectorAll("#Menu a.delete")[0].onclick = this.sendGetPlanNamesRequest;
+        this.dialog.querySelectorAll('input.submit-modal')[0].onclick = this.sendDeletePlanRequest;
     };
 }

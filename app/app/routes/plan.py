@@ -36,10 +36,9 @@ def rename_plan():
     return jsonify({'status': 'error', 'action': 'rename plan', 'text': text}), 200
 
 
-@plan_bp.route('/delete-plan', methods=['DELETE'])
-def delete_plan():
+@plan_bp.route('/delete-plan/<plan_name>', methods=['DELETE'])
+def delete_plan(plan_name):
     time.sleep(1)
-    plan_name = request.data.decode('utf-8')
     result = plan_service.delete_plan(plan_name)
 
     if result is PlanServiceResponse.success:
@@ -65,7 +64,7 @@ def open_plan(plan_name):
 
 
 @plan_bp.route('/get-plan-names/', methods=['GET'])
-def get_plan():
+def get_plan_names():
     time.sleep(1)
     result = plan_service.get_plan_names()
 
