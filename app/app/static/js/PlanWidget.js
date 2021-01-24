@@ -1,11 +1,12 @@
 import RenamePlanCommand from "./RenamePlanCommand.js";
 
-export default function PlanWidget(app) {
+export default function PlanWidget(app) {;
     this.app = app;
     this.input = document.querySelectorAll('header input.plan-name')[0];
     this.widget = document.querySelectorAll('div.plan')[0];
     this.input.value = "";
     this.planNameCopy = "";
+
     this.init = () => {
         this.input.onchange = this.onchangePlanName;
         this.input.onclick = this.onclickPlanName;

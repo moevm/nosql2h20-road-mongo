@@ -1,4 +1,4 @@
-export default function ErrWindow(app) {
+export default function MsgWindow(app) {
     this.app = app;
     this.init = () => {
         this.errWindow = document.getElementById('err-window');

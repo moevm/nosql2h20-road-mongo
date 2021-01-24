@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../static/css/modal.css"></link>
     <link rel="stylesheet" href="../static/css/err-window.css"></link>
     <link rel="stylesheet" href="../static/css/index.css"></link>
+    <link rel="stylesheet" href="../static/css/review-dialog.css"></link>
 </head>
 <body>
 <header>
@@ -66,12 +67,33 @@
         </p>
     </div>
 </div>
-<div class="modal" id="review-dialog">
-   <div>
-
-   </div>
+<div class="modal" id="DeletePlanDialog">
+    <div class="modal-review">
+        <header class="modal-header">
+            <label>Удалить план</label>
+            <button class="close-modal">x</button>
+        </header>
+            <p>
+                <select name="plansToDelete">
+                    <option value="s1">План 1</option>
+                </select>
+            </p>
+        <input class="submit-modal" type="submit" value="Удалить">
+    </div>
 </div>
-
+<div class="modal" id="open-plan-dialog">
+    <div class="modal-review">
+        <header class="modal-header">
+            <label>Открыть план</label>
+            <button class="close-modal">x</button>
+        </header>
+            <p>
+                <select name="plansToDelete">
+                </select>
+            </p>
+        <input class="submit-modal" type="submit" value="Открыть">
+    </div>
+</div>
 </body>
 <script type="module" src="../static/js/main.js"></script>
 
