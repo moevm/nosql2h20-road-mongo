@@ -5,9 +5,9 @@ import MsgWindow from "./MsgWindow.js";
 import Menu from "./Menu.js";
 import WaitAnimation from "./WaitAnimation.js";
 import PlanWidget from "./PlanWidget.js";
+import MapWidget from "./MapWidget.js";
 import * as Const from "./Constants.js"
 import * as msg from "./ServerResMsg.js";
-
 function App() {
     this.createPlanDialog = new CreatePlanDialog(this);
     this.openPlanDialog = new OpenPlanDialog(this, "open-plan-dialog");
@@ -16,6 +16,7 @@ function App() {
     this.menu = new Menu(this);
     this.waitAnimation = new WaitAnimation(this);
     this.planWidget = new PlanWidget(this);
+    this.mapWidget = new MapWidget(this);
 
     this.run = () => {
         this.createPlanDialog.init();
@@ -124,3 +125,13 @@ function App() {
 
 let app = new App();
 app.run();
+
+// var map = L.map('map').setView([51.505, -0.09], 13);
+//
+// L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+// }).addTo(map);
+//
+// L.marker([51.5, -0.09]).addTo(map)
+//     .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+//     .openPopup();
