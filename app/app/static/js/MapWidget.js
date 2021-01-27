@@ -30,24 +30,30 @@ export default function MapWidget(app) {
         'way[highway=tertiary]({{bbox}});' +
         'way[highway=residential]({{bbox}}););' +
         '>;out qt;';
-    const pointRadius = 2;
+    const pointRadius = 3;
     const pointBorderColor = "red";
     const pointFillColor = "green";
+    const polyLineColor = "green";
+    const polyLineStyle = {color: polyLineColor, weight: 2, opacity: 0.5};
+    const latLngMargin = 0.00001;
 
     this.app = app;
     this.osm = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         'opacity': 0.7,
         'attribution': [attrOsm, attrOverpass].join(', ')
     });
-    this.map = new L.Map('map').addLayer(this.osm).setView(initPos, initZoom);
+    this.map = new L.Map('map',).addLayer(this.osm).setView(initPos, initZoom);
     this.opl = new L.OverPassLayer({'query': query, onSuccess: data => this.setupOverPassLayer(data)});
     this.map.addLayer(this.opl);
-    this.circlesToPoints = {};
-    this.relationsToPolylines = [];
-    this.curPolyline = null;
+    this.circles = new Set();
+    this.circle = null;
+    this.polyline = null;
+    this.circlePairsToPolylines = {};
+    this.polylinesToCirclePairs = {};
+    this.circleToId = {};
+
     this.setupOverPassLayer = function (data) {
         for (let i = 0; i < data.elements.length; i++) {
-            // if (data.elements[i].hasOwnProperty("tags") && data.elements[i].tags.hasOwnProperty("highway")) {
             let circle = new L.circle([data.elements[i].lat, data.elements[i].lon], {
                 color: pointBorderColor,
                 fillColor: pointFillColor,
@@ -55,25 +61,66 @@ export default function MapWidget(app) {
                 radius: pointRadius
             }).addTo(this.map);
             circle.on('click', (circle) => this.onCircleClicked(circle));
-            // this.circlesToPoints[circle] = data.elements[i];
-
-            // }
         }
-    }
-    this.onCircleClicked = (circle) => {
-        let pos = circle.latlng;
-        this.curPolyline = new L.Polyline([pos, pos], {
-                color: 'green',
-                weight: 5,
-                opacity: 0.5
-            }).addTo(this.map);
-            this.map.fitBounds(this.curPolyline.getBounds());
+    };
+    this.copyPolyLine = (polyline) => {
+        return new L.Polyline(polyline.getLatLngs(), polyLineStyle);
+    };
+    this.onCircleClicked = (e) => {
+        let circle = e.target;
+
+        if (this.circle !== circle) {
+            let pos = circle.getBounds().getCenter();
+
+            if (!this.polyline) {
+                this.circle = circle;
+                this.polyline = new L.Polyline([pos, pos], polyLineStyle).addTo(this.map);
+                this.map.fitBounds(this.polyline.getBounds());
+            }
+            else if(!this.isPolylineExists(this.circle, circle)) {
+                this.polyline.setLatLngs([this.polyline.getLatLngs()[0], pos]);
+
+                let polylineCopy = this.copyPolyLine(this.polyline);
+                let key = this.makeKeyFromCirclePair(this.circle, circle);
+
+                this.circlePairsToPolylines[key] = polylineCopy;
+                polylineCopy.addTo(this.map);
+                polylineCopy.on('click', e => this.onPolyLineClick(e));
+                this.map.fitBounds(polylineCopy.getBounds());
+
+                this.polyline = null;
+                this.circle = null;
+            }
+        }
+        this.circles.add(circle);
     }
     this.map.on('mousemove', e => {
-        if (this.curPolyline) {
-            let [begin, _] = this.curPolyline.getLatLngs();
-            this.curPolyline.setLatLngs([begin, e.latlng]);
-            console.log(e.latlng);
+        if (this.polyline) {
+            let lat = e.latlng.lat - latLngMargin;
+            let lng = e.latlng.lng - latLngMargin;
+            this.polyline.setLatLngs([this.polyline.getLatLngs()[0], new L.LatLng(lat, lng)]);
         }
     });
+    this.makeKeyFromCirclePair = (circle1, circle2) => {
+        let latLng1 = circle1.getBounds().getCenter();
+        let latLng2 = circle2.getBounds().getCenter();
+        return JSON.stringify([latLng1, latLng2]);
+    };
+    this.onPolyLineClick = (polyline) => {
+
+    };
+    this.isPolylineExists = (circle1, circle2) => {
+        let key1 = this.makeKeyFromCirclePair(circle1, circle2);
+        let key2 = this.makeKeyFromCirclePair(circle2, circle1);
+
+        for(let key in this.circlePairsToPolylines) {
+            if (key === key2 || key === key1) {
+                return true;
+            }
+        }
+        return false;
+    };
+    this.getPlan = () => {
+
+    };
 }
