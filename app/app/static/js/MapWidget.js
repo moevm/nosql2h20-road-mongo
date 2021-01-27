@@ -1,9 +1,3 @@
-function Point(lat, lon, street) {
-    this.lat = lat;
-    this.lon = lon;
-    this.street = street;
-}
-
 const mapAliases = [
     'улица',
     'аллея',
@@ -45,11 +39,12 @@ export default function MapWidget(app) {
     this.map = new L.Map('map',).addLayer(this.osm).setView(initPos, initZoom);
     this.opl = new L.OverPassLayer({'query': query, onSuccess: data => this.setupOverPassLayer(data)});
     this.map.addLayer(this.opl);
-    this.circles = new Set();
+    this.points = new Set();
+    this.relations = [];
     this.circle = null;
     this.polyline = null;
-    this.circlePairHashToPolyline = {};
-    this.polylineHashToCirclePairHash = {};
+    this.pointPairHashToPolyline = {};
+    this.polylineHashToPointPairHash = {};
 
     this.setupOverPassLayer = function (data) {
         for (let i = 0; i < data.elements.length; i++) {
@@ -75,27 +70,31 @@ export default function MapWidget(app) {
                 this.circle = circle;
                 this.polyline = new L.Polyline([pos, pos], polyLineStyle).addTo(this.map);
                 this.map.fitBounds(this.polyline.getBounds());
+                this.points.add(circle.getBounds.getCenter());
             }
             else if(!this.isPolylineExists(this.circle, circle)) {
+                this.points.add(circle.getBounds.getCenter());
+
                 this.polyline.setLatLngs([this.polyline.getLatLngs()[0], pos]);
 
                 let polylineCopy = this.copyPolyLine(this.polyline);
-                let circlePairHash = this.makeHashFromCirclePair(this.circle, circle);
+                let pointPairHash = this.makeHashFromCirclePair(this.circle, circle);
                 let polyLineHash = this.makeHashFromPolyline(polylineCopy);
 
-                this.circlePairHashToPolyline[circlePairHash] = polyLineHash;
-                this.polylineHashToCirclePairHash[polyLineHash] = circlePairHash;
+                this.pointPairHashToPolyline[pointPairHash] = polyLineHash;
+                this.polylineHashToPointPairHash[polyLineHash] = pointPairHash;
 
                 polylineCopy.addTo(this.map);
                 polylineCopy.on('click', e => this.onPolyLineClick(e));
                 this.map.fitBounds(polylineCopy.getBounds());
+
+                this.relations.push(polylineCopy.getLanLngs());
 
                 this.polyline.removeFrom(this.map);
                 this.polyline = null;
                 this.circle = null;
             }
         }
-        this.circles.add(circle);
     }
     this.map.on('mousemove', e => {
         if (this.polyline) {
@@ -133,18 +132,27 @@ export default function MapWidget(app) {
     this.onPolyLineClick = e => {
         let polyline = e.target;
         let polylineHash = this.makeHashFromPolyline(polyline);
-        let circlePairHash = this.polylineHashToCirclePairHash[polylineHash];
+        let pointPairHash = this.polylineHashToPointPairHash[polylineHash];
 
-        delete this.circlePairHashToPolyline[circlePairHash]
-        delete this.polylineHashToCirclePairHash[polylineHash];
+        let points = JSON.parse(pointPairHash);
+        this.points.delete(points[0]);
+        this.points.delete(points[1]);
+
+        delete this.pointPairHashToPolyline[pointPairHash]
+        delete this.polylineHashToPointPairHash[polylineHash];
 
         polyline.removeFrom(this.map);
+
+        let index = this.relations.indexOf(polyline.getLanLngs());
+        if (index >= 0) {
+            arr.splice(index, 1);
+        }
     };
     this.isPolylineExists = (circle1, circle2) => {
         let key1 = this.makeHashFromCirclePair(circle1, circle2);
         let key2 = this.makeHashFromCirclePair(circle2, circle1);
 
-        for(let key in this.circlePairHashToPolyline) {
+        for(let key in this.pointPairHashToPolyline) {
             if (key === key2 || key === key1) {
                 return true;
             }
@@ -152,6 +160,14 @@ export default function MapWidget(app) {
         return false;
     };
     this.getPlan = () => {
-
+        return {"points": Array.from(this.points), "relations": this.relations};
     };
+    this.clearMap = () => {
+        this.relations.length = 0;
+        this.points.clear();
+        this.polyline = null;
+        this.circle = null;
+        this.polylineHashToPointPairHash.clear();
+        this.pointPairHashToPolyline.clear();
+    }
 }

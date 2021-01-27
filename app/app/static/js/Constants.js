@@ -7,6 +7,7 @@ export const FAILED_TO_CREATE_PLAN_MSG = 'Не удалось создать п�
 export const FAILED_TO_RENAME_PLAN_MSG = 'Не удалось переименовать план.';
 export const FAILED_TO_DELETE_PLAN_MSG = 'Не удалось удалить план.';
 export const FAILED_TO_OPEN_PLAN_MSG = 'Не удалось открыть план.';
+export const FAILED_TO_UPDATE_PLAN_MSG = 'Не удалось обновить план.';
 export const FAILED_TO_ESTIMATE_PLAN_MSG = 'Не удалось оценить фронт работ.';
 export const FAILED_TO_GET_PLAN_NAMES_MSG = 'Не удалось получить названия планов.';
 
@@ -28,4 +29,5 @@ export const ACTON_RENAME_PLAN = 'rename plan';
 export const ACTON_DELETE_PLAN = 'delete plan';
 export const ACTON_ESTIMATE_PLAN = 'estimate plan';
 export const ACTON_GET_PLAN_NAMES = 'get plan names';
+export const ACTON_UPDATE_PLAN = 'update plan';
 

@@ -75,3 +75,19 @@ def get_plan_names():
     text = result.name.replace('_', ' ')
 
     return jsonify({'status': 'error', 'action': 'get plan names', 'text': text}), 200
+
+
+@plan_bp.route('/update-plan', methods=['PUT'])
+def update_plan():
+    time.sleep(1)
+    data = json.loads(request.data.decode('utf-8'))
+    plan_name = data['planName']
+    plan = data['plan']
+    result = plan_service.update_plan(plan_name, plan)
+
+    if result is PlanServiceResponse.success:
+        return jsonify({'status': 'success', 'action': 'update plan'}), 200
+
+    text = result.name.replace('_', ' ')
+
+    return jsonify({'status': 'error', 'action': 'update plan', 'text': text}), 200

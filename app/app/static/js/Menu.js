@@ -72,9 +72,29 @@
 
 export default function Menu(app) {
     this.app = app;
+    this.init = () => {
+        this.saveCommand = document.querySelectorAll("#Menu li a.save")[0];
+        this.exportCommand = document.querySelectorAll("#Menu li a.export")[0];
+        this.setSaveCommandState(true);
+        this.setExportCommandState(true);
+    }
     this.close = () => {
         document.querySelectorAll(".Menu li.-hasSubmenu").forEach( (e) => {
             e.hideMenu();
         });
+    };
+    this.setSaveCommandState = (disabled) => {
+        this.saveCommand.style.color = disabled ? "gray": "black";
+        this.saveCommandDisabled = disabled;
+    }
+    this.getSaveCommandState = () => {
+        return this.saveCommandDisabled;
+    };
+    this.setExportCommandState = (disabled) => {
+        this.exportCommand.style.color = disabled ? "gray": "black";
+        this.exportCommandDisabled = disabled;
+    }
+    this.getExportCommandState = () => {
+        return this.exportCommandDisabled;
     };
 }
