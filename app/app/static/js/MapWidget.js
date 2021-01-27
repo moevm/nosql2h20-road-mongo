@@ -34,7 +34,7 @@ export default function MapWidget(app) {
     const pointBorderColor = "red";
     const pointFillColor = "green";
     const polyLineColor = "green";
-    const polyLineStyle = {color: polyLineColor, weight: 2, opacity: 0.5};
+    const polyLineStyle = {color: polyLineColor, weight: 4, opacity: 0.5};
     const latLngMargin = 0.00001;
 
     this.app = app;
@@ -48,9 +48,8 @@ export default function MapWidget(app) {
     this.circles = new Set();
     this.circle = null;
     this.polyline = null;
-    this.circlePairsToPolylines = {};
-    this.polylinesToCirclePairs = {};
-    this.circleToId = {};
+    this.circlePairHashToPolyline = {};
+    this.polylineHashToCirclePairHash = {};
 
     this.setupOverPassLayer = function (data) {
         for (let i = 0; i < data.elements.length; i++) {
@@ -60,10 +59,10 @@ export default function MapWidget(app) {
                 fillOpacity: 0.5,
                 radius: pointRadius
             }).addTo(this.map);
-            circle.on('click', (circle) => this.onCircleClicked(circle));
+            circle.on('click', circle => this.onCircleClicked(circle));
         }
     };
-    this.copyPolyLine = (polyline) => {
+    this.copyPolyLine = polyline => {
         return new L.Polyline(polyline.getLatLngs(), polyLineStyle);
     };
     this.onCircleClicked = (e) => {
@@ -81,13 +80,17 @@ export default function MapWidget(app) {
                 this.polyline.setLatLngs([this.polyline.getLatLngs()[0], pos]);
 
                 let polylineCopy = this.copyPolyLine(this.polyline);
-                let key = this.makeKeyFromCirclePair(this.circle, circle);
+                let circlePairHash = this.makeHashFromCirclePair(this.circle, circle);
+                let polyLineHash = this.makeHashFromPolyline(polylineCopy);
 
-                this.circlePairsToPolylines[key] = polylineCopy;
+                this.circlePairHashToPolyline[circlePairHash] = polyLineHash;
+                this.polylineHashToCirclePairHash[polyLineHash] = circlePairHash;
+
                 polylineCopy.addTo(this.map);
                 polylineCopy.on('click', e => this.onPolyLineClick(e));
                 this.map.fitBounds(polylineCopy.getBounds());
 
+                this.polyline.removeFrom(this.map);
                 this.polyline = null;
                 this.circle = null;
             }
@@ -96,24 +99,52 @@ export default function MapWidget(app) {
     }
     this.map.on('mousemove', e => {
         if (this.polyline) {
-            let lat = e.latlng.lat - latLngMargin;
-            let lng = e.latlng.lng - latLngMargin;
+            let lat = e.latlng.lat;
+            let lng = e.latlng.lng;
+
+            let center = this.circle.getBounds().getCenter();
+
+            if (center.lat < lat) {
+                lat -= latLngMargin;
+            }
+            else {
+                lat += latLngMargin;
+            }
+
+            if (center.lng < lng) {
+                lng -= latLngMargin;
+            }
+            else {
+                lng += latLngMargin;
+            }
+
             this.polyline.setLatLngs([this.polyline.getLatLngs()[0], new L.LatLng(lat, lng)]);
         }
     });
-    this.makeKeyFromCirclePair = (circle1, circle2) => {
-        let latLng1 = circle1.getBounds().getCenter();
-        let latLng2 = circle2.getBounds().getCenter();
-        return JSON.stringify([latLng1, latLng2]);
-    };
-    this.onPolyLineClick = (polyline) => {
+    this.makeHashFromCirclePair = (circle1, circle2) => {
+        let latLng1s = circle1.getBounds().getCenter();
+        let latLng2s = circle2.getBounds().getCenter();
 
+        return JSON.stringify([latLng1s, latLng2s]);
+    };
+    this.makeHashFromPolyline = polyline => {
+        return JSON.stringify(polyline.getLatLngs());
+    }
+    this.onPolyLineClick = e => {
+        let polyline = e.target;
+        let polylineHash = this.makeHashFromPolyline(polyline);
+        let circlePairHash = this.polylineHashToCirclePairHash[polylineHash];
+
+        delete this.circlePairHashToPolyline[circlePairHash]
+        delete this.polylineHashToCirclePairHash[polylineHash];
+
+        polyline.removeFrom(this.map);
     };
     this.isPolylineExists = (circle1, circle2) => {
-        let key1 = this.makeKeyFromCirclePair(circle1, circle2);
-        let key2 = this.makeKeyFromCirclePair(circle2, circle1);
+        let key1 = this.makeHashFromCirclePair(circle1, circle2);
+        let key2 = this.makeHashFromCirclePair(circle2, circle1);
 
-        for(let key in this.circlePairsToPolylines) {
+        for(let key in this.circlePairHashToPolyline) {
             if (key === key2 || key === key1) {
                 return true;
             }
