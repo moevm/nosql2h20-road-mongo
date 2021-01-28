@@ -71,30 +71,49 @@
 })();
 
 export default function Menu(app) {
+    function disable(disabled) {
+        return disabled ? "gray" : "black";
+    }
+
     this.app = app;
     this.init = () => {
+        this.createCommand = document.querySelectorAll("#Menu li a.create")[0];
+        this.openCommand = document.querySelectorAll("#Menu li a.open")[0];
         this.saveCommand = document.querySelectorAll("#Menu li a.save")[0];
+        this.deleteCommand = document.querySelectorAll("#Menu li a.delete")[0];
+        this.importCommand = document.querySelectorAll("#Menu li a.import")[0];
         this.exportCommand = document.querySelectorAll("#Menu li a.export")[0];
+
+        this.setCreateCommandState(true);
+        this.setOpenCommandState(true);
         this.setSaveCommandState(true);
+        this.setDeleteCommandState(true);
+        this.setImportCommandState(true);
         this.setExportCommandState(true);
     }
     this.close = () => {
-        document.querySelectorAll(".Menu li.-hasSubmenu").forEach( (e) => {
+        document.querySelectorAll(".Menu li.-hasSubmenu").forEach((e) => {
             e.hideMenu();
         });
     };
+    this.setCreateCommandState = (disabled) => {
+        this.createCommand.style.color = disable(disabled);
+    };
+    this.setOpenCommandState = (disabled) => {
+        this.openCommand.style.color = disable(disabled);
+    };
     this.setSaveCommandState = (disabled) => {
-        this.saveCommand.style.color = disabled ? "gray": "black";
-        this.saveCommandDisabled = disabled;
-    }
-    this.getSaveCommandState = () => {
-        return this.saveCommandDisabled;
+        this.saveCommand.style.color = disable(disabled);
+    };
+    this.setDeleteCommandState = (disabled) => {
+        this.deleteCommand.style.color = disable(disabled);
+    };
+    this.setImportCommandState = (disabled) => {
+        this.importCommand.style.color = disable(disabled);
     };
     this.setExportCommandState = (disabled) => {
-        this.exportCommand.style.color = disabled ? "gray": "black";
-        this.exportCommandDisabled = disabled;
-    }
-    this.getExportCommandState = () => {
-        return this.exportCommandDisabled;
+        this.exportCommand.style.color = disable(disabled);
+        let parent = this.exportCommand.closest("li.-hasSubmenu");
+        parent.querySelectorAll("li a.exportInJSON")[0].style.color = disable(disabled);
     };
 }

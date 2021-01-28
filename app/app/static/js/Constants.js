@@ -30,4 +30,3 @@ export const ACTON_DELETE_PLAN = 'delete plan';
 export const ACTON_ESTIMATE_PLAN = 'estimate plan';
 export const ACTON_GET_PLAN_NAMES = 'get plan names';
 export const ACTON_UPDATE_PLAN = 'update plan';
-

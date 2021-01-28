@@ -26,11 +26,11 @@ class PlanDAO(object):
 
     def get(self, name):
         global plans
-        return name, plans[name]
+        return plans[name]
 
     def get_plan_names(self):
         global plans
-        return plans.keys()
+        return list(plans.keys())
 
     def update(self, name, plan):
         global plans

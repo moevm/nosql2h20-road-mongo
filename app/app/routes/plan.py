@@ -56,7 +56,9 @@ def open_plan(plan_name):
 
     if result is PlanServiceResponse.success:
         plan = plan_service.get_resource()
-        return jsonify({'status': 'success', 'action': 'delete plan', 'plan': plan}), 200
+        response = {'status': 'success', 'action': 'open plan'}
+        response.update(plan)
+        return jsonify(response), 200
 
     text = result.name.replace('_', ' ')
 
@@ -70,7 +72,7 @@ def get_plan_names():
 
     if result is PlanServiceResponse.success:
         plan_names = plan_service.get_resource()
-        return jsonify({'status': 'success', 'action': 'delete plan', 'names': plan_names}), 200
+        return jsonify({'status': 'success', 'action': 'get plan names', 'names': plan_names}), 200
 
     text = result.name.replace('_', ' ')
 
