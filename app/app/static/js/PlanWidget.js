@@ -26,7 +26,6 @@ export default function PlanWidget(app) {;
     this.onchangePlanName = () => {
         this.app.onPlanNameChange();
         this.sendRenamePlanRequest();
-        console.log("this.planNameCopy: ", this.planNameCopy);
     };
     this.onclickPlanName = () => {
         this.planNameCopy = this.input.value;

@@ -5,14 +5,16 @@ plans = {}
 
 class PlanDAO(object):
 
-    def insert(self, name, plan={}):
+    def insert(self, name, plan=None):
+        if plan is None:
+            plan = {'plan': {'relations': {}}}
         global plans
         plans[name] = plan
 
         return True
 
     def exists(self, name):
-        return name in plans.keys()
+        return name in list(plans.keys())
 
     def replace(self, name, new_name):
         global plans
