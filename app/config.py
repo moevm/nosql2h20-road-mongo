@@ -10,3 +10,4 @@ class Release(Config):
 
 class Development(Config):
     DEBUG = True
+
