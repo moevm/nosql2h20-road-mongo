@@ -12,20 +12,16 @@ import * as msg from "./ServerResMsg.js";
 
 function App() {
     this.mapWidget = new MapWidget(this);
-    this.createPlanDialog = new CreatePlanDialog(this);
-    this.openPlanDialog = new OpenPlanDialog(this, "open-plan-dialog");
-    this.deletePlanDialog = new DeletePlanDialog(this, "delete-plan-dialog");
-    this.msgWindow = new MsgWindow(this);
     this.menu = new Menu(this);
+    this.createPlanDialog = new CreatePlanDialog(this, this.menu);
+    this.openPlanDialog = new OpenPlanDialog(this, this.menu, "open-plan-dialog");
+    this.deletePlanDialog = new DeletePlanDialog(this, this.menu, "delete-plan-dialog");
+    this.msgWindow = new MsgWindow(this);
     this.waitAnimation = new WaitAnimation(this);
     this.planWidget = new PlanWidget(this);
-    this.planSaver = new PlanSaver(this);
-
-    this.isPlanning = false;
+    this.planSaver = new PlanSaver(this, this.menu);
 
     this.run = () => {
-        document.querySelectorAll("#Menu a.save")[0].onclick = this.onSave;
-
         this.createPlanDialog.init();
         this.openPlanDialog.init();
         this.deletePlanDialog.init();
@@ -33,6 +29,7 @@ function App() {
         this.menu.init();
         this.msgWindow.init();
         this.waitAnimation.init();
+        this.planSaver.init();
     };
     this.onSendCreatePlanRequestStart = () => {
         this.createPlanDialog.close();
@@ -42,11 +39,10 @@ function App() {
         this.waitAnimation.close();
         let [m, text] = msg.buildCreatePlanResMsg(res);
         if (text === Const.SUCCESS) {
-            this.isPlanning = true;
             this.planWidget.setPlanName(this.createPlanDialog.getPlanName());
             this.planWidget.show();
-            this.menu.setSaveCommandState(false);
-            this.menu.setExportCommandState(false);
+            this.planSaver.setSaveState(true);
+            this.menu.setExportCommandState(true);
             this.mapWidget.setWidgetEnabled(true);
             this.mapWidget.clearMap();
             return;
@@ -72,9 +68,8 @@ function App() {
         this.waitAnimation.close();
         let [m, text] = msg.buildOpenPlanResMsg(res);
         if (text === Const.SUCCESS) {
-            this.isPlanning = true;
-            this.menu.setSaveCommandState(false);
-            this.menu.setExportCommandState(false);
+            this.planSaver.setSaveState(true);
+            this.menu.setExportCommandState(true);
             this.planWidget.setPlanName(this.openPlanDialog.getPlanName());
             this.planWidget.show();
             this.mapWidget.setWidgetEnabled(true);
@@ -116,9 +111,8 @@ function App() {
             let deletedPlanName = this.deletePlanDialog.getPlanName();
             if (currentPlanName === deletedPlanName) {
                 this.planWidget.close();
-                this.isPlanning = false;
-                this.menu.setSaveCommandState(true);
-                this.menu.setExportCommandState(true);
+                this.planSaver.setSaveState(false);
+                this.menu.setExportCommandState(false);
                 this.mapWidget.setWidgetEnabled(false);
                 this.mapWidget.clearMap();
             }
@@ -144,15 +138,11 @@ function App() {
         console.log('а монга-то запущена?:)');
         console.log('sudo service mongodb start');
     };
-    this.onSave = () => {
-        if (this.isPlanning) {
-            let plan = this.mapWidget.getPlan();
-            let planName = this.planWidget.getPlanName();
-            this.planSaver.savePlan(planName, plan);
-        }
-    };
     this.onSavePlanStart = () => {
         this.waitAnimation.show();
+        let plan = this.mapWidget.getPlan();
+        let planName = this.planWidget.getPlanName();
+        return [planName, plan];
     }
     this.onSavePlanEnd = (res) => {
         this.waitAnimation.close()
@@ -162,12 +152,11 @@ function App() {
         }
     };
     this.onMapWidgetIsReady = () => {
-        this.menu.setCreateCommandState(false);
-        this.menu.setOpenCommandState(false);
-        this.menu.setSaveCommandState(true);
-        this.menu.setDeleteCommandState(false);
-        this.menu.setImportCommandState(false);
-        this.menu.setExportCommandState(true);
+        this.createPlanDialog.setDialogState(true);
+        this.openPlanDialog.setDialogState(true);
+        this.deletePlanDialog.setDialogState(true);
+        this.planSaver.setSaveState(true);
+        this.menu.setImportCommandState(true);
     }
 }
 

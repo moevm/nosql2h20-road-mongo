@@ -1,9 +1,10 @@
 import ReviewPlanDialog from "./ReviewPlanDialog.js";
 import OpenPlanCommand from "./OpenPlanCommand.js";
 
-export default function OpenPlanDialog(app, id) {
-    ReviewPlanDialog.apply(this, arguments);
+export default function OpenPlanDialog(app, menu, id) {
+    ReviewPlanDialog.apply(this, [app, id]);
 
+    this.menu = menu;
     this.sendOpenPlanRequest = async () => {
         this.planName = this.select.value;
         this.app.onSendOpenPlanRequestStart();
@@ -19,7 +20,15 @@ export default function OpenPlanDialog(app, id) {
     this.parentInit = this.init;
     this.init = () => {
         this.parentInit();
-        document.querySelectorAll("#Menu a.open")[0].onclick = this.sendGetPlanNamesRequest;
+        this.openCmd = document.querySelectorAll("#Menu a.open")[0];
         this.dialog.querySelectorAll('input.submit-modal')[0].onclick = this.sendOpenPlanRequest;
+    };
+    this.setDialogState = (enabled) => {
+        this.menu.setOpenCommandState(enabled);
+        if (enabled) {
+            this.openCmd.onclick = this.sendGetPlanNamesRequest;
+        } else {
+            this.openCmd.onclick = '';
+        }
     };
 }

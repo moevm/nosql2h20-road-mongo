@@ -1,9 +1,10 @@
 import ReviewPlanDialog from "./ReviewPlanDialog.js";
 import DeletePlanCommand from "./DeletePlanCommand.js";
 
-export default function DeletePlanDialog(app, id) {
-    ReviewPlanDialog.apply(this, arguments);
+export default function DeletePlanDialog(app, menu, id) {
+    ReviewPlanDialog.apply(this, [app, id]);
 
+    this.menu = menu;
     this.sendDeletePlanRequest = async () => {
         this.planName = this.select.value;
         this.app.onSendDeletePlanRequestStart();
@@ -19,7 +20,15 @@ export default function DeletePlanDialog(app, id) {
     this.parentInit = this.init;
     this.init = () => {
         this.parentInit();
-        document.querySelectorAll("#Menu a.delete")[0].onclick = this.sendGetPlanNamesRequest;
+        this.deleteCmd = document.querySelectorAll("#Menu a.delete")[0];
         this.dialog.querySelectorAll('input.submit-modal')[0].onclick = this.sendDeletePlanRequest;
+    };
+    this.setDialogState = (enabled) => {
+        this.menu.setDeleteCommandState(enabled);
+        if (enabled) {
+            this.deleteCmd.onclick = this.sendGetPlanNamesRequest;
+        } else {
+            this.deleteCmd.onclick = '';
+        }
     };
 }
