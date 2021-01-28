@@ -165,10 +165,43 @@ function buildDeletePlanResMsg(res) {
     return ["", Const.SUCCESS];
 }
 
+function buildUpdatePlanResMsg(res) {
+    if (res.status !== 'success') {
+        let action = "";
+        let text = "";
+
+        if (res.action === Const.ACTON_UPDATE_PLAN) {
+            action = Const.FAILED_TO_UPDATE_PLAN_MSG;
+        } else {
+            return [Const.UNEXPECTED_ERR_MSG, Const.UNEXPECTED_ERR];
+        }
+
+        switch (res.text) {
+            case Const.UNEXPECTED_DB_ERR:
+                text = Const.UNEXPECTED_DB_ERR_MSG;
+                break;
+            case Const.PLAN_NAME_NOT_EXISTS_ERR:
+            case Const.INVALID_PLAN_NAME_ERR:
+            default:
+                return [Const.UNEXPECTED_ERR_MSG, Const.UNEXPECTED_ERR_MSG];
+        }
+
+        return [concat(action, text), text];
+    }
+    return ["", Const.SUCCESS];
+}
 buildCreatePlanResMsg = buildUnexpectedErrMsg(buildCreatePlanResMsg);
 buildRenamePlanResMsg = buildUnexpectedErrMsg(buildRenamePlanResMsg);
 buildGetPlanNamesResMsg = buildUnexpectedErrMsg(buildGetPlanNamesResMsg);
 buildOpenPlanResMsg = buildUnexpectedErrMsg(buildOpenPlanResMsg);
 buildDeletePlanResMsg = buildUnexpectedErrMsg(buildDeletePlanResMsg);
+buildUpdatePlanResMsg = buildUnexpectedErrMsg(buildUpdatePlanResMsg);
 
-export {buildCreatePlanResMsg, buildRenamePlanResMsg, buildGetPlanNamesResMsg, buildOpenPlanResMsg, buildDeletePlanResMsg}
+export {
+    buildCreatePlanResMsg,
+    buildRenamePlanResMsg,
+    buildGetPlanNamesResMsg,
+    buildOpenPlanResMsg,
+    buildDeletePlanResMsg,
+    buildUpdatePlanResMsg
+}

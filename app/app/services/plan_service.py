@@ -80,5 +80,10 @@ class PlanService(object):
         self._resource = plan_dao.get_plan_names()
         return PlanServiceResponse.success
 
+    @__check_plan_name(True)
+    def update_plan(self, name, plan):
+        plan_dao.update(name, plan)
+        return PlanServiceResponse.success
+
 
 plan_service = PlanService()

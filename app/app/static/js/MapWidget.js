@@ -1,9 +1,3 @@
-function Point(lat, lon, street) {
-    this.lat = lat;
-    this.lon = lon;
-    this.street = street;
-}
-
 const mapAliases = [
     'улица',
     'аллея',
@@ -30,11 +24,11 @@ export default function MapWidget(app) {
         'way[highway=tertiary]({{bbox}});' +
         'way[highway=residential]({{bbox}}););' +
         '>;out qt;';
-    const pointRadius = 3;
+    const pointRadius = 4;
     const pointBorderColor = "red";
     const pointFillColor = "green";
     const polyLineColor = "green";
-    const polyLineStyle = {color: polyLineColor, weight: 4, opacity: 0.5};
+    const polyLineStyle = {color: polyLineColor, weight: 3, opacity: 0.8};
     const latLngMargin = 0.00001;
 
     this.app = app;
@@ -43,14 +37,18 @@ export default function MapWidget(app) {
         'attribution': [attrOsm, attrOverpass].join(', ')
     });
     this.map = new L.Map('map',).addLayer(this.osm).setView(initPos, initZoom);
-    this.opl = new L.OverPassLayer({'query': query, onSuccess: data => this.setupOverPassLayer(data)});
+    this.opl = new L.OverPassLayer({
+        'query': query, onSuccess: data => {
+            this.setupOverPassLayer(data);
+            this.app.onMapWidgetIsReady();
+        }
+    });
     this.map.addLayer(this.opl);
-    this.circles = new Set();
-    this.circle = null;
+    this.relations = [];
+    this.polylines = [];
     this.polyline = null;
-    this.circlePairHashToPolyline = {};
-    this.polylineHashToCirclePairHash = {};
-
+    this.mapWidgetEnabled = false;
+    this.setWidgetEnabled = enabled => this.mapWidgetEnabled = enabled;
     this.setupOverPassLayer = function (data) {
         for (let i = 0; i < data.elements.length; i++) {
             let circle = new L.circle([data.elements[i].lat, data.elements[i].lon], {
@@ -66,92 +64,94 @@ export default function MapWidget(app) {
         return new L.Polyline(polyline.getLatLngs(), polyLineStyle);
     };
     this.onCircleClicked = (e) => {
-        let circle = e.target;
-
-        if (this.circle !== circle) {
+        if (this.mapWidgetEnabled) {
+            let circle = e.target;
             let pos = circle.getBounds().getCenter();
 
             if (!this.polyline) {
-                this.circle = circle;
                 this.polyline = new L.Polyline([pos, pos], polyLineStyle).addTo(this.map);
                 this.map.fitBounds(this.polyline.getBounds());
+                return;
             }
-            else if(!this.isPolylineExists(this.circle, circle)) {
-                this.polyline.setLatLngs([this.polyline.getLatLngs()[0], pos]);
+
+            let beginPos = this.polyline.getLatLngs()[0];
+
+            if (pos !== beginPos && !this.isPolylineExists(beginPos, pos)) {
+                this.polyline.setLatLngs([beginPos, pos]);
 
                 let polylineCopy = this.copyPolyLine(this.polyline);
-                let circlePairHash = this.makeHashFromCirclePair(this.circle, circle);
-                let polyLineHash = this.makeHashFromPolyline(polylineCopy);
-
-                this.circlePairHashToPolyline[circlePairHash] = polyLineHash;
-                this.polylineHashToCirclePairHash[polyLineHash] = circlePairHash;
 
                 polylineCopy.addTo(this.map);
                 polylineCopy.on('click', e => this.onPolyLineClick(e));
                 this.map.fitBounds(polylineCopy.getBounds());
 
+                this.relations.push(polylineCopy.getLatLngs());
+                this.polylines.push(polylineCopy);
+
                 this.polyline.removeFrom(this.map);
                 this.polyline = null;
-                this.circle = null;
             }
         }
-        this.circles.add(circle);
     }
     this.map.on('mousemove', e => {
-        if (this.polyline) {
+        if (this.mapWidgetEnabled && this.polyline) {
             let lat = e.latlng.lat;
             let lng = e.latlng.lng;
 
-            let center = this.circle.getBounds().getCenter();
+            let center = this.polyline.getLatLngs()[0];
 
             if (center.lat < lat) {
                 lat -= latLngMargin;
-            }
-            else {
+            } else {
                 lat += latLngMargin;
             }
 
             if (center.lng < lng) {
                 lng -= latLngMargin;
-            }
-            else {
+            } else {
                 lng += latLngMargin;
             }
 
             this.polyline.setLatLngs([this.polyline.getLatLngs()[0], new L.LatLng(lat, lng)]);
         }
     });
-    this.makeHashFromCirclePair = (circle1, circle2) => {
-        let latLng1s = circle1.getBounds().getCenter();
-        let latLng2s = circle2.getBounds().getCenter();
-
-        return JSON.stringify([latLng1s, latLng2s]);
-    };
-    this.makeHashFromPolyline = polyline => {
-        return JSON.stringify(polyline.getLatLngs());
-    }
     this.onPolyLineClick = e => {
-        let polyline = e.target;
-        let polylineHash = this.makeHashFromPolyline(polyline);
-        let circlePairHash = this.polylineHashToCirclePairHash[polylineHash];
-
-        delete this.circlePairHashToPolyline[circlePairHash]
-        delete this.polylineHashToCirclePairHash[polylineHash];
-
-        polyline.removeFrom(this.map);
+        if (this.mapWidgetEnabled) {
+            let polyline = e.target;
+            this.polylines.remove(polyline);
+            polyline.removeFrom(this.map);
+            let index = this.relations.indexOf(polyline.getLatLngs());
+            if (index >= 0) {
+                this.relations.splice(index, 1);
+            }
+        }
     };
-    this.isPolylineExists = (circle1, circle2) => {
-        let key1 = this.makeHashFromCirclePair(circle1, circle2);
-        let key2 = this.makeHashFromCirclePair(circle2, circle1);
-
-        for(let key in this.circlePairHashToPolyline) {
-            if (key === key2 || key === key1) {
+    this.isPolylineExists = (pos1, pos2) => {
+        let key1 = JSON.stringify([pos1, pos2]);
+        let key2 = JSON.stringify([pos2, pos1]);
+        for (let i = 0; i < this.relations.length; ++i) {
+            let key = JSON.stringify(this.relations[i]);
+            if (key === key1 || key === key2) {
                 return true;
             }
         }
         return false;
     };
     this.getPlan = () => {
-
+        return {plan: {relations: this.relations}};
     };
+    this.clearMap = () => {
+        this.relations.length = 0;
+        this.polyline = null;
+        this.polylines.forEach(e => e.removeFrom(this.map));
+        this.polylines.length = 0;
+    };
+    this.setPlan = (plan) => {
+        this.clearMap();
+        this.relations = plan.relations;
+        for(let i = 0; i < this.relations.length; ++i) {
+            let polyline = new L.Polyline(this.relations[i], polyLineStyle).addTo(this.map);
+            this.map.fitBounds(polyline.getBounds());
+        }
+    }
 }

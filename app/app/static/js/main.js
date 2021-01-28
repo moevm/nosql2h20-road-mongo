@@ -6,9 +6,12 @@ import Menu from "./Menu.js";
 import WaitAnimation from "./WaitAnimation.js";
 import PlanWidget from "./PlanWidget.js";
 import MapWidget from "./MapWidget.js";
+import PlanSaver from "./PlanSaver.js";
 import * as Const from "./Constants.js"
 import * as msg from "./ServerResMsg.js";
+
 function App() {
+    this.mapWidget = new MapWidget(this);
     this.createPlanDialog = new CreatePlanDialog(this);
     this.openPlanDialog = new OpenPlanDialog(this, "open-plan-dialog");
     this.deletePlanDialog = new DeletePlanDialog(this, "delete-plan-dialog");
@@ -16,13 +19,18 @@ function App() {
     this.menu = new Menu(this);
     this.waitAnimation = new WaitAnimation(this);
     this.planWidget = new PlanWidget(this);
-    this.mapWidget = new MapWidget(this);
+    this.planSaver = new PlanSaver(this);
+
+    this.isPlanning = false;
 
     this.run = () => {
+        document.querySelectorAll("#Menu a.save")[0].onclick = this.onSave;
+
         this.createPlanDialog.init();
         this.openPlanDialog.init();
         this.deletePlanDialog.init();
         this.planWidget.init();
+        this.menu.init();
         this.msgWindow.init();
         this.waitAnimation.init();
     };
@@ -34,8 +42,13 @@ function App() {
         this.waitAnimation.close();
         let [m, text] = msg.buildCreatePlanResMsg(res);
         if (text === Const.SUCCESS) {
+            this.isPlanning = true;
             this.planWidget.setPlanName(this.createPlanDialog.getPlanName());
             this.planWidget.show();
+            this.menu.setSaveCommandState(false);
+            this.menu.setExportCommandState(false);
+            this.mapWidget.setWidgetEnabled(true);
+            this.mapWidget.clearMap();
             return;
         }
         this.msgWindow.show(m);
@@ -59,8 +72,13 @@ function App() {
         this.waitAnimation.close();
         let [m, text] = msg.buildOpenPlanResMsg(res);
         if (text === Const.SUCCESS) {
+            this.isPlanning = true;
+            this.menu.setSaveCommandState(false);
+            this.menu.setExportCommandState(false);
             this.planWidget.setPlanName(this.openPlanDialog.getPlanName());
             this.planWidget.show();
+            this.mapWidget.setWidgetEnabled(true);
+            this.mapWidget.setPlan(res.plan);
             return;
         }
         this.msgWindow.show(m);
@@ -98,6 +116,11 @@ function App() {
             let deletedPlanName = this.deletePlanDialog.getPlanName();
             if (currentPlanName === deletedPlanName) {
                 this.planWidget.close();
+                this.isPlanning = false;
+                this.menu.setSaveCommandState(true);
+                this.menu.setExportCommandState(true);
+                this.mapWidget.setWidgetEnabled(false);
+                this.mapWidget.clearMap();
             }
             return;
         }
@@ -121,6 +144,31 @@ function App() {
         console.log('а монга-то запущена?:)');
         console.log('sudo service mongodb start');
     };
+    this.onSave = () => {
+        if (this.isPlanning) {
+            let plan = this.mapWidget.getPlan();
+            let planName = this.planWidget.getPlanName();
+            this.planSaver.savePlan(planName, plan);
+        }
+    };
+    this.onSavePlanStart = () => {
+        this.waitAnimation.show();
+    }
+    this.onSavePlanEnd = (res) => {
+        this.waitAnimation.close()
+        let [m, text] = msg.buildUpdatePlanResMsg(res);
+        if (text !== Const.SUCCESS) {
+            this.msgWindow.show(m);
+        }
+    };
+    this.onMapWidgetIsReady = () => {
+        this.menu.setCreateCommandState(false);
+        this.menu.setOpenCommandState(false);
+        this.menu.setSaveCommandState(true);
+        this.menu.setDeleteCommandState(false);
+        this.menu.setImportCommandState(false);
+        this.menu.setExportCommandState(true);
+    }
 }
 
 let app = new App();

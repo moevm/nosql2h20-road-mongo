@@ -56,7 +56,9 @@ def open_plan(plan_name):
 
     if result is PlanServiceResponse.success:
         plan = plan_service.get_resource()
-        return jsonify({'status': 'success', 'action': 'delete plan', 'plan': plan}), 200
+        response = {'status': 'success', 'action': 'open plan'}
+        response.update(plan)
+        return jsonify(response), 200
 
     text = result.name.replace('_', ' ')
 
@@ -70,8 +72,24 @@ def get_plan_names():
 
     if result is PlanServiceResponse.success:
         plan_names = plan_service.get_resource()
-        return jsonify({'status': 'success', 'action': 'delete plan', 'names': plan_names}), 200
+        return jsonify({'status': 'success', 'action': 'get plan names', 'names': plan_names}), 200
 
     text = result.name.replace('_', ' ')
 
     return jsonify({'status': 'error', 'action': 'get plan names', 'text': text}), 200
+
+
+@plan_bp.route('/update-plan', methods=['PUT'])
+def update_plan():
+    time.sleep(1)
+    data = json.loads(request.data.decode('utf-8'))
+    plan_name = data['planName']
+    plan = data['plan']
+    result = plan_service.update_plan(plan_name, plan)
+
+    if result is PlanServiceResponse.success:
+        return jsonify({'status': 'success', 'action': 'update plan'}), 200
+
+    text = result.name.replace('_', ' ')
+
+    return jsonify({'status': 'error', 'action': 'update plan', 'text': text}), 200
