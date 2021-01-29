@@ -4,7 +4,13 @@ mongo = PyMongo()
 
 
 def db_import_from_json(jsn):
-	pass
+	temp = db_export_into_json()
+
+	for collection_name in mongo.db.list_collection_names():
+		mongo.db[collection_name].drop()
+
+	for collection in jsn['collections']:
+		mongo.db[collection.keys()[0]] = collection.values()[0]
 
 def db_export_into_json():
 	jsn = { 'collections': [] }
