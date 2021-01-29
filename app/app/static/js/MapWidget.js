@@ -151,6 +151,7 @@ export default function MapWidget(app) {
         this.relations = plan.relations;
         for(let i = 0; i < this.relations.length; ++i) {
             let polyline = new L.Polyline(this.relations[i], polyLineStyle).addTo(this.map);
+            this.polylines.push(polyline);
             this.map.fitBounds(polyline.getBounds());
         }
     }
