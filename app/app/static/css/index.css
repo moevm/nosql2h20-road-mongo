@@ -1,0 +1,65 @@
+:root {
+    --button-font: 16px 'Arial', 'Helvetica', sans-serif;
+    --button-radius: .3em;
+}
+
+header {
+    padding-top: 2px;
+    padding-left: 2px;
+    display: flex;
+    position: relative;
+}
+
+input.plan-name {
+    border: 1px solid #7ebc6f;
+    font: 16px 'Arial', 'Helvetica', sans-serif;
+    height: 40px;
+    border-radius: 5px;
+    padding: 0 12px;
+    text-align: center;
+}
+
+input.plan-name:hover,
+input.plan-name:focus,
+input.plan-name:active {
+    border: 1px solid #7ebc6f;
+    outline: none;
+}
+
+div.plan {
+    margin-left: .2em;
+    visibility: hidden;
+}
+
+button.normal {
+    outline: none;
+    background-color: #fff;
+    color: #7ebc6f;
+    padding: 0px 12px;
+    height: 40px;
+    border: 1px solid #7ebc6f;
+    cursor: pointer;
+    font: var(--button-font);
+    border-radius: var(--button-radius);
+}
+
+button.normal:hover,
+button.normal:focus,
+button.normal:active {
+    background-color: #7ebc6f;
+    color: #fff;
+    border: 1px solid #7ebc6f;
+}
+
+main {
+    height: 100%;
+    width: 100%;
+}
+
+body, html {
+    margin: 0;
+    display: inline;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+}

@@ -1,0 +1,58 @@
+:root {
+  --lightgray: #efefef;
+  --blue: steelblue;
+  --white: #fff;
+  --black: rgba(0, 0, 0, 0.8);
+  --bounceEasing: cubic-bezier(0.51, 0.92, 0.24, 1.15);
+  --modal-font: 24px 'Arial', 'Helvetica', sans-serif;
+}
+
+.modal.is-visible {
+  visibility: visible;
+  opacity: 1;
+}
+
+.modal-dialog {
+  border: none;
+  font: var(--modal-font);
+  position: relative;
+  max-width: 800px;
+  max-height: 100vh;
+  border-radius: 5px;
+  background: var(--white);
+  overflow: auto;
+  cursor: default;
+  padding: .1em;
+}
+
+.modal-dialog input {
+  margin: .1em;
+  padding: .1em;
+  font: var(--modal-font);
+  border: 1px solid #899089;
+  border-radius: var(--border-radius);
+  display: block;
+}
+
+.modal-dialog input.submit-modal {
+  background-color: white;
+  color: #000;
+  border: .1em solid #899089;
+  cursor: pointer;
+  float: right;
+}
+.modal-dialog input.submit-modal:hover,
+.modal-dialog input.submit-modal:active,
+.modal-dialog input.submit-modal:focus {
+  background-color: #7ebc6f;
+  border: .1em solid #7ebc6f;
+  outline: none;
+  color: #fff;
+}
+
+.modal-header {
+  background: var(--lightgray);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

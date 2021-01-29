@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="../static/css/menu.css"></link>
+    <link rel="stylesheet" href="../static/css/dialog.css"></link>
+    <link rel="stylesheet" href="../static/css/modal.css"></link>
+    <link rel="stylesheet" href="../static/css/err-window.css"></link>
+    <link rel="stylesheet" href="../static/css/index.css"></link>
+    <link rel="stylesheet" href="../static/css/review-dialog.css"></link>
+    <link rel="stylesheet" href="../static/css/map.css"></link>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+          crossorigin=""/>
+
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+            crossorigin=""></script>
+
+   <script src="../static/js/libs/OverPassLayer.bundle.js"></script>
+
+</head>
+<body>
+<header>
+    <div>
+        <ul id="Menu" class="Menu -horizontal">
+            <li class="-hasSubmenu">
+                <a href="#">План</a>
+                <ul>
+                    <li><a class="create" href="#">Создать</a></li>
+                    <li><a class="open" href="#">Открыть</a></li>
+                    <li><a class="save" href="#">Сохранить</a></li>
+                    <li><a class="delete" href="#">Удалить</a></li>
+                    <li class="-hasSubmenu">
+                        <a class="import" href="#">Импортировать</a>
+                        <ul>
+                            <li><a class="importJSON" href="#">Импортировать JSON</a></li>
+                        </ul>
+                    </li>
+                    <li class="-hasSubmenu">
+                        <a class="export" href="#">Экспортировать</a>
+                        <ul>
+                            <li><a class="exportInJSON" href="#">Экспортировать в JSON</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="#">Статистика</a></li>
+        </ul>
+    </div>
+    <div class="plan">
+        <input class="plan-name" type="text">
+        <button class="normal">
+            Оценить фронт работ
+        </button>
+    </div>
+</header>
+<main>
+    <div id="map"></div>
+</main>
+
+<div class="modal" id="createPlanDialog">
+    <div class="modal-dialog">
+        <header class="modal-header">
+            <label>Создание нового плана</label>
+            <button class="close-modal">x</button>
+        </header>
+        <input type="text" name="plan-name" placeholder="Название плана">
+        <input class="submit-modal" type="submit" value="Создать">
+    </div>
+</div>
+<div class="modal" id="wait-animation">
+    <img src="../static/img/wait.gif" height="50">
+</div>
+<div class="modal" id="err-window">
+    <div class="modal-err-window">
+        <header class="modal-header">
+            <label>Oh, shit! :(</label>
+            <button class="close-modal">x</button>
+        </header>
+        <p class="content">
+        </p>
+    </div>
+</div>
+<div class="modal" id="delete-plan-dialog">
+    <div class="modal-review">
+        <header class="modal-header">
+            <label>Удалить план</label>
+            <button class="close-modal">x</button>
+        </header>
+        <p>
+            <select name="plansToDelete">
+            </select>
+        </p>
+        <input class="submit-modal" type="submit" value="Удалить">
+    </div>
+</div>
+<div class="modal" id="open-plan-dialog">
+    <div class="modal-review">
+        <header class="modal-header">
+            <label>Открыть план</label>
+            <button class="close-modal">x</button>
+        </header>
+        <p>
+            <select name="plansToDelete">
+            </select>
+        </p>
+        <input class="submit-modal" type="submit" value="Открыть">
+    </div>
+</div>
+</body>
+<script type="module" src="../static/js/main.js"></script>
+
+</html>
