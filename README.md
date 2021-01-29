@@ -1,8 +1,8 @@
 # nosql2h20-road-mongo
 
 ## Table of contents
-- [HelloWorld](HelloWorld)
-- [Прототип "Хранение и представление"](Прототип "Хранение и представление")
+- [HelloWorld](##HelloWorld)
+- [Прототип "Хранение и представление"](##Прототип "Хранение и представление")
 ## HelloWorld
 
 ![res](HelloWorld/no_sql_screencast.gif)
