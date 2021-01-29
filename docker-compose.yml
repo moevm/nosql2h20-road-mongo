@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  app:
+    build: .
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    container_name: road_plan_app
+
+  mongo:
+    image: "mongo:4.0.17-xenial"
+    restart: always
+    container_name: road_plan_mongo

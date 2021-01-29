@@ -1,6 +1,6 @@
 class Config(object):
     DEBUG = False
-    MONGO_URI = "mongodb://localhost:27017/db"
+    MONGO_URI = "mongodb://mongo:27017/db"
     MONGO_DBNAME = 'db'
 
 
