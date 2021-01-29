@@ -33,6 +33,10 @@ function App() {
     };
     this.onSendCreatePlanRequestStart = () => {
         this.createPlanDialog.close();
+
+        if (this.planWidget.getPlanName() != "")
+            this.planSaver.savePlan()
+
         this.waitAnimation.show();
     };
     this.onSendCreatePlanRequestEnd = (res) => {
@@ -62,6 +66,10 @@ function App() {
     };
     this.onSendOpenPlanRequestStart = () => {
         this.openPlanDialog.close();
+        
+        if (this.planWidget.getPlanName() != "")
+            this.planSaver.savePlan()
+
         this.waitAnimation.show();
     };
     this.onSendOpenPlanRequestEnd = (res) => {
